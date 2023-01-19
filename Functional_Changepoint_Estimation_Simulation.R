@@ -1,7 +1,8 @@
+# Fix the typo on Line 670 and 745, have not tested the performance yet
 # This is the version that runs on GPU.
 # We set a seed at the very beginning and then generate the data. 
 # The jobID will be used as the seed.
-walltime = 4 # time limit of the job
+walltime = 8 # time limit of the job
 time_begin = Sys.time()
 library(mvtnorm)
 library(tmvtnorm)
@@ -25,7 +26,7 @@ pic = FALSE
 # If not, will read from the directory specified directly.
 first = TRUE
 
-iters = 20000 # number of the iterations for MCMC
+iters = 200#20000 # number of the iterations for MCMC
 D = 21 # L, number of Fourier basis functions used to generate the functional data
 ns = 50 # N, number of spatial locations in the alternative region
 ns_null = 5 # N_0, number of loctaions without changepoint (true null)
@@ -661,12 +662,12 @@ for(i in 1:iters){
   acc[1,7] <- acc[1,7]+1
   curll_b <- l_y+l_b
   
-  sigma2_move_b = 0.00001
+  sigma2_move_b = 0.000004
   canpreb <- rmvnorm(1,preb,sigma2_move_b*diag(ns))
   canr_b = canpreb-mu_b
   canr_b_sum = crossprod(matrix(canr_b,ncol=1),Sigma_inv%*%matrix(canr_b,ncol=1))
   canl_b = -ns/2*log(sigma2_b)+1/2*log(Sigma_det)-1/(2*sigma2_b)*canr_b_sum
-  canb = exp(preb)
+  canb = exp(canpreb)
   cantau2 <- (rep(a,nt)*t^2*(1-t)^2+rep(canb,nt)*Nt*rep(c,nt)^2*t*(1-t)^3)*ifelse(t>rep(c,nt),1,0)+
     (rep(a,nt)*t^2*(1-t)^2+rep(canb,nt)*Nt*(1-rep(c,nt))^2*t^3*(1-t))*ifelse(t<=rep(c,nt),1,0)
   cantauV.inv <- matrix(1/sqrt(cantau2),nrow=1)
@@ -721,7 +722,7 @@ for(i in 1:iters){
   acc[1,9] <- acc[1,9]+1
   curll_phi <- l_beta+l_b+l_c+l_phi
   
-  sigma2_move_phi = 0.001
+  sigma2_move_phi = 0.0004
   canphi <- rnorm(1, mean = phi, sd = sqrt(sigma2_move_phi))
   while(canphi<=0) {canphi <- rnorm(1, mean = phi, sd = sqrt(sigma2_move_phi))}
   canl_phi = log(dexp(canphi, rate=tau_phi))
@@ -741,7 +742,7 @@ for(i in 1:iters){
   if(runif(1)<exp(MH)){
     acc[2,9] <-acc[2,9]+1
     phi <- canphi; Sigma <- canSigma; l_phi <- canl_phi; Sigma_inv <- canSigma_inv; Sigma_det<- canSigma_det;
-    l_beta <- canl_beta; canl_b <- canl_b; l_c <- canl_c
+    l_beta <- canl_beta; l_b <- canl_b; l_c <- canl_c
     r_beta_sum <- canr_beta_sum ; r_b_sum<-canr_b_sum;r_c_sum<-canr_c_sum
   }
   
