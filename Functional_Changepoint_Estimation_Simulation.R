@@ -2,7 +2,7 @@
 # This is the version that runs on GPU.
 # We set a seed at the very beginning and then generate the data. 
 # The jobID will be used as the seed.
-walltime = 8 # time limit of the job
+walltime = 4 # time limit of the job
 time_begin = Sys.time()
 library(mvtnorm)
 library(tmvtnorm)
@@ -26,7 +26,7 @@ pic = FALSE
 # If not, will read from the directory specified directly.
 first = TRUE
 
-iters = 200#20000 # number of the iterations for MCMC
+iters = 20000 # number of the iterations for MCMC
 D = 21 # L, number of Fourier basis functions used to generate the functional data
 ns = 50 # N, number of spatial locations in the alternative region
 ns_null = 5 # N_0, number of loctaions without changepoint (true null)
